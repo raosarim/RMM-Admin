@@ -3,33 +3,32 @@ import Button from '@/components/ui/Button'
 import Card from '@/components/ui/Card'
 import DataTable from '@/components/shared/DataTable'
 import {
-    apiGetLandingModes,
-    apiCreateLandingMode,
-    apiUpdateLandingMode,
-    apiDeleteLandingMode,
-    LandingMode,
-} from '@/services/LandingModeService'
-import LandingModeEditDialog from './LandingModeEditDialog'
-import LandingModeViewDialog from './LandingModeViewDialog'
+    apiGetFaqCategories,
+    apiCreateFaqCategory,
+    apiUpdateFaqCategory,
+    apiDeleteFaqCategory,
+} from '@/services/FaqService'
+import type { FaqCategory } from '@/services/FaqService'
+import FaqCategoryEditDialog from './FaqCategoryEditDialog'
+import FaqCategoryViewDialog from './FaqCategoryViewDialog'
 import { HiOutlinePencil, HiOutlineTrash, HiPlus, HiOutlineEye } from 'react-icons/hi'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import { Notification, toast } from '@/components/ui'
-import Badge from '@/components/ui/Badge'
 import type { ColumnDef } from '@/components/shared/DataTable'
 
-const LandingModesView = () => {
-    const [data, setData] = useState<LandingMode[]>([])
+const FaqCategory = () => {
+    const [data, setData] = useState<FaqCategory[]>([])
     const [loading, setLoading] = useState(false)
     const [isEditOpen, setIsEditOpen] = useState(false)
     const [isViewOpen, setIsViewOpen] = useState(false)
     const [isConfirmOpen, setIsConfirmOpen] = useState(false)
-    const [selectedData, setSelectedData] = useState<LandingMode | null>(null)
+    const [selectedData, setSelectedData] = useState<FaqCategory | null>(null)
     const [deletingId, setDeletingId] = useState<string | null>(null)
 
     const fetchData = async () => {
         setLoading(true)
         try {
-            const response = await apiGetLandingModes()
+            const response = await apiGetFaqCategories()
             if (response) {
                 setData(response)
             }
@@ -49,12 +48,12 @@ const LandingModesView = () => {
         setIsEditOpen(true)
     }
 
-    const handleEdit = (row: LandingMode) => {
+    const handleEdit = (row: FaqCategory) => {
         setSelectedData(row)
         setIsEditOpen(true)
     }
 
-    const handleView = (row: LandingMode) => {
+    const handleView = (row: FaqCategory) => {
         setSelectedData(row)
         setIsViewOpen(true)
     }
@@ -67,10 +66,10 @@ const LandingModesView = () => {
     const onConfirmDelete = async () => {
         if (deletingId) {
             try {
-                await apiDeleteLandingMode(deletingId)
+                await apiDeleteFaqCategory(deletingId)
                 toast.push(
                     <Notification title="Success" type="success">
-                        Landing mode deleted successfully
+                        Category deleted successfully
                     </Notification>
                 )
                 fetchData()
@@ -83,20 +82,20 @@ const LandingModesView = () => {
         }
     }
 
-    const onFormSubmit = async (formData: Omit<LandingMode, 'id'>) => {
+    const onFormSubmit = async (formData: Omit<FaqCategory, 'id'>) => {
         try {
             if (selectedData) {
-                await apiUpdateLandingMode({ ...formData, id: selectedData.id })
+                await apiUpdateFaqCategory({ ...formData, id: selectedData.id })
                 toast.push(
                     <Notification title="Success" type="success">
-                        Landing mode updated successfully
+                        Category updated successfully
                     </Notification>
                 )
             } else {
-                await apiCreateLandingMode(formData)
+                await apiCreateFaqCategory(formData)
                 toast.push(
                     <Notification title="Success" type="success">
-                        Landing mode created successfully
+                        Category created successfully
                     </Notification>
                 )
             }
@@ -106,57 +105,26 @@ const LandingModesView = () => {
         }
     }
 
-    const columns: ColumnDef<LandingMode>[] = useMemo(
+    const columns: ColumnDef<FaqCategory>[] = useMemo(
         () => [
             {
-                header: 'Title',
-                accessorKey: 'title',
+                header: 'Icon',
+                accessorKey: 'iconURL',
                 cell: (props) => {
                     const row = props.row.original
                     return (
-                        <div className="flex items-center gap-2">
-                            {row.iconURL && (
-                                <img src={row.iconURL} alt={row.title} className="w-8 h-8 object-contain" />
-                            )}
-                            <span className="font-bold">{row.title}</span>
+                        <div className="flex items-center">
+                            <img src={row.iconURL} alt={row.title} className="w-8 h-8 object-contain" />
                         </div>
                     )
                 }
             },
             {
-                header: 'Type',
-                accessorKey: 'landingModeType',
-                cell: (props) => {
-                    const type = props.row.original.landingModeType
-                    return <span>{type.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</span>
-                }
+                header: 'Title',
+                accessorKey: 'title',
             },
             {
-                header: () => (
-                    <div className="flex justify-center font-bold uppercase">
-                        Status
-                    </div>
-                ),
-                accessorKey: 'isActive',
-                enableSorting: false,
-                cell: (props) => {
-                    const isActive = props.row.original.isActive
-                    return (
-                        <div className="flex justify-center">
-                            <Badge
-                                content={isActive ? 'Active' : 'Inactive'}
-                                innerClass={isActive ? 'bg-emerald-500' : 'bg-red-500'}
-                            />
-                        </div>
-                    )
-                },
-            },
-            {
-                header: () => (
-                    <div className="flex justify-center font-bold uppercase">
-                        Actions
-                    </div>
-                ),
+                header: () => <div className="text-center">Actions</div>,
                 id: 'actions',
                 cell: (props) => {
                     const row = props.row.original
@@ -192,7 +160,7 @@ const LandingModesView = () => {
         <>
             <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
-                    <h3 className="heading-text">Landing Modes</h3>
+                    <h3 className="heading-text">FAQ Categories</h3>
                     <Button
                         size="sm"
                         variant="solid"
@@ -212,14 +180,14 @@ const LandingModesView = () => {
                 </Card>
             </div>
 
-            <LandingModeEditDialog
+            <FaqCategoryEditDialog
                 isOpen={isEditOpen}
                 onClose={() => setIsEditOpen(false)}
                 onSubmit={onFormSubmit}
                 editingData={selectedData}
             />
 
-            <LandingModeViewDialog
+            <FaqCategoryViewDialog
                 isOpen={isViewOpen}
                 onClose={() => setIsViewOpen(false)}
                 data={selectedData}
@@ -228,16 +196,16 @@ const LandingModesView = () => {
             <ConfirmDialog
                 isOpen={isConfirmOpen}
                 type="danger"
-                title="Delete Landing Mode"
+                title="Delete Category"
                 confirmButtonProps={{ color: 'red-600' }}
                 onClose={() => setIsConfirmOpen(false)}
                 onCancel={() => setIsConfirmOpen(false)}
                 onConfirm={onConfirmDelete}
             >
-                <p>Are you sure you want to delete this landing mode? This action cannot be undone.</p>
+                <p>Are you sure you want to delete this category? This action cannot be undone.</p>
             </ConfirmDialog>
         </>
     )
 }
 
-export default LandingModesView
+export default FaqCategory

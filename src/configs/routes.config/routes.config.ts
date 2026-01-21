@@ -38,9 +38,27 @@ export const protectedRoutes: Routes = [
         authority: [],
     },
     {
+        key: 'faqCategory',
+        path: '/faq-category',
+        component: lazy(() => import('@/views/demo/FaqCategory')),
+        authority: [],
+    },
+    {
+        key: 'subscriptionPackage',
+        path: '/subscription-package',
+        component: lazy(() => import('@/views/demo/SubscriptionPackage')),
+        authority: [],
+    },
+    {
         key: 'contactAndSupport',
         path: '/contact-and-support',
         component: lazy(() => import('@/views/demo/ContactAndSupport')),
+        authority: [],
+    },
+    {
+        key: 'privacyAndPolicy',
+        path: '/privacy-and-policy',
+        component: lazy(() => import('@/views/demo/PrivacyAndPolicy')),
         authority: [],
     },
     {

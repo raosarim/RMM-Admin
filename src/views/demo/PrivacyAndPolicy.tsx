@@ -3,33 +3,30 @@ import Button from '@/components/ui/Button'
 import Card from '@/components/ui/Card'
 import DataTable from '@/components/shared/DataTable'
 import {
-    apiGetLandingModes,
-    apiCreateLandingMode,
-    apiUpdateLandingMode,
-    apiDeleteLandingMode,
-    LandingMode,
-} from '@/services/LandingModeService'
-import LandingModeEditDialog from './LandingModeEditDialog'
-import LandingModeViewDialog from './LandingModeViewDialog'
-import { HiOutlinePencil, HiOutlineTrash, HiPlus, HiOutlineEye } from 'react-icons/hi'
+    apiGetPrivacyPolicies,
+    apiCreatePrivacyPolicy,
+    apiUpdatePrivacyPolicy,
+    apiDeletePrivacyPolicy,
+    PrivacyPolicy,
+} from '@/services/PrivacyService'
+import PrivacyEditDialog from './PrivacyEditDialog'
+import { HiOutlinePencil, HiOutlineTrash, HiPlus } from 'react-icons/hi'
 import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import { Notification, toast } from '@/components/ui'
-import Badge from '@/components/ui/Badge'
 import type { ColumnDef } from '@/components/shared/DataTable'
 
-const LandingModesView = () => {
-    const [data, setData] = useState<LandingMode[]>([])
+const PrivacyAndPolicy = () => {
+    const [data, setData] = useState<PrivacyPolicy[]>([])
     const [loading, setLoading] = useState(false)
-    const [isEditOpen, setIsEditOpen] = useState(false)
-    const [isViewOpen, setIsViewOpen] = useState(false)
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [isConfirmOpen, setIsConfirmOpen] = useState(false)
-    const [selectedData, setSelectedData] = useState<LandingMode | null>(null)
+    const [editingData, setEditingData] = useState<PrivacyPolicy | null>(null)
     const [deletingId, setDeletingId] = useState<string | null>(null)
 
     const fetchData = async () => {
         setLoading(true)
         try {
-            const response = await apiGetLandingModes()
+            const response = await apiGetPrivacyPolicies()
             if (response) {
                 setData(response)
             }
@@ -45,18 +42,13 @@ const LandingModesView = () => {
     }, [])
 
     const handleCreate = () => {
-        setSelectedData(null)
-        setIsEditOpen(true)
+        setEditingData(null)
+        setIsDialogOpen(true)
     }
 
-    const handleEdit = (row: LandingMode) => {
-        setSelectedData(row)
-        setIsEditOpen(true)
-    }
-
-    const handleView = (row: LandingMode) => {
-        setSelectedData(row)
-        setIsViewOpen(true)
+    const handleEdit = (row: PrivacyPolicy) => {
+        setEditingData(row)
+        setIsDialogOpen(true)
     }
 
     const handleDelete = (id: string) => {
@@ -67,10 +59,10 @@ const LandingModesView = () => {
     const onConfirmDelete = async () => {
         if (deletingId) {
             try {
-                await apiDeleteLandingMode(deletingId)
+                await apiDeletePrivacyPolicy(deletingId)
                 toast.push(
                     <Notification title="Success" type="success">
-                        Landing mode deleted successfully
+                        Policy deleted successfully
                     </Notification>
                 )
                 fetchData()
@@ -83,20 +75,20 @@ const LandingModesView = () => {
         }
     }
 
-    const onFormSubmit = async (formData: Omit<LandingMode, 'id'>) => {
+    const onDialogSubmit = async (formData: Omit<PrivacyPolicy, 'id'>) => {
         try {
-            if (selectedData) {
-                await apiUpdateLandingMode({ ...formData, id: selectedData.id })
+            if (editingData) {
+                await apiUpdatePrivacyPolicy({ ...formData, id: editingData.id })
                 toast.push(
                     <Notification title="Success" type="success">
-                        Landing mode updated successfully
+                        Policy updated successfully
                     </Notification>
                 )
             } else {
-                await apiCreateLandingMode(formData)
+                await apiCreatePrivacyPolicy(formData)
                 toast.push(
                     <Notification title="Success" type="success">
-                        Landing mode created successfully
+                        Policy created successfully
                     </Notification>
                 )
             }
@@ -106,68 +98,56 @@ const LandingModesView = () => {
         }
     }
 
-    const columns: ColumnDef<LandingMode>[] = useMemo(
+    const columns: ColumnDef<PrivacyPolicy>[] = useMemo(
         () => [
             {
                 header: 'Title',
                 accessorKey: 'title',
-                cell: (props) => {
-                    const row = props.row.original
-                    return (
-                        <div className="flex items-center gap-2">
-                            {row.iconURL && (
-                                <img src={row.iconURL} alt={row.title} className="w-8 h-8 object-contain" />
-                            )}
-                            <span className="font-bold">{row.title}</span>
-                        </div>
-                    )
-                }
             },
             {
                 header: 'Type',
-                accessorKey: 'landingModeType',
+                accessorKey: 'type',
                 cell: (props) => {
-                    const type = props.row.original.landingModeType
-                    return <span>{type.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</span>
-                }
-            },
-            {
-                header: () => (
-                    <div className="flex justify-center font-bold uppercase">
-                        Status
-                    </div>
-                ),
-                accessorKey: 'isActive',
-                enableSorting: false,
-                cell: (props) => {
-                    const isActive = props.row.original.isActive
+                    const row = props.row.original
                     return (
-                        <div className="flex justify-center">
-                            <Badge
-                                content={isActive ? 'Active' : 'Inactive'}
-                                innerClass={isActive ? 'bg-emerald-500' : 'bg-red-500'}
-                            />
-                        </div>
+                        <span className="capitalize">
+                            {row.type.replace(/_/g, ' ')}
+                        </span>
                     )
                 },
             },
             {
-                header: () => (
-                    <div className="flex justify-center font-bold uppercase">
-                        Actions
-                    </div>
-                ),
+                header: 'Content',
+                accessorKey: 'content',
+                cell: (props) => {
+                    const row = props.row.original
+                    const plainText = row.content.replace(/<[^>]*>?/gm, '')
+                    return (
+                        <span className="truncate max-w-[400px] block">
+                            {plainText}
+                        </span>
+                    )
+                },
+            },
+            {
+                header: 'Effective Date',
+                accessorKey: 'effectiveDate',
+                cell: (props) => {
+                    const row = props.row.original
+                    return (
+                        <span>
+                            {new Date(row.effectiveDate).toLocaleDateString()}
+                        </span>
+                    )
+                },
+            },
+            {
+                header: () => <div className="text-center">Actions</div>,
                 id: 'actions',
                 cell: (props) => {
                     const row = props.row.original
                     return (
                         <div className="flex justify-center text-lg">
-                            <span
-                                className="cursor-pointer p-2 hover:text-primary"
-                                onClick={() => handleView(row)}
-                            >
-                                <HiOutlineEye />
-                            </span>
                             <span
                                 className="cursor-pointer p-2 hover:text-primary"
                                 onClick={() => handleEdit(row)}
@@ -192,7 +172,7 @@ const LandingModesView = () => {
         <>
             <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
-                    <h3 className="heading-text">Landing Modes</h3>
+                    <h3 className="heading-text">Privacy and Policy</h3>
                     <Button
                         size="sm"
                         variant="solid"
@@ -212,32 +192,26 @@ const LandingModesView = () => {
                 </Card>
             </div>
 
-            <LandingModeEditDialog
-                isOpen={isEditOpen}
-                onClose={() => setIsEditOpen(false)}
-                onSubmit={onFormSubmit}
-                editingData={selectedData}
-            />
-
-            <LandingModeViewDialog
-                isOpen={isViewOpen}
-                onClose={() => setIsViewOpen(false)}
-                data={selectedData}
+            <PrivacyEditDialog
+                isOpen={isDialogOpen}
+                onClose={() => setIsDialogOpen(false)}
+                onSubmit={onDialogSubmit}
+                editingData={editingData}
             />
 
             <ConfirmDialog
                 isOpen={isConfirmOpen}
                 type="danger"
-                title="Delete Landing Mode"
+                title="Delete Policy"
                 confirmButtonProps={{ color: 'red-600' }}
                 onClose={() => setIsConfirmOpen(false)}
                 onCancel={() => setIsConfirmOpen(false)}
                 onConfirm={onConfirmDelete}
             >
-                <p>Are you sure you want to delete this landing mode? This action cannot be undone.</p>
+                <p>Are you sure you want to delete this privacy policy? This action cannot be undone.</p>
             </ConfirmDialog>
         </>
     )
 }
 
-export default LandingModesView
+export default PrivacyAndPolicy
