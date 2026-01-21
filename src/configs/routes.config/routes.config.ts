@@ -14,9 +14,33 @@ export const protectedRoutes: Routes = [
     },
     /** Example purpose only, please remove */
     {
-        key: 'singleMenuItem',
-        path: '/single-menu-view',
-        component: lazy(() => import('@/views/demo/SingleMenuView')),
+        key: 'landingModeView',
+        path: '/landing-mode-view',
+        component: lazy(() => import('@/views/demo/LandingModesView')),
+        authority: [],
+    },
+    {
+        key: 'templatesView',
+        path: '/templates-view',
+        component: lazy(() => import('@/views/demo/TemplatesView')),
+        authority: [],
+    },
+    {
+        key: 'subscriptionView',
+        path: '/subscription-view',
+        component: lazy(() => import('@/views/demo/SubscriptionView')),
+        authority: [],
+    },
+    {
+        key: 'faqView',
+        path: '/faq-view',
+        component: lazy(() => import('@/views/demo/FaqView')),
+        authority: [],
+    },
+    {
+        key: 'contactAndSupport',
+        path: '/contact-and-support',
+        component: lazy(() => import('@/views/demo/ContactAndSupport')),
         authority: [],
     },
     {

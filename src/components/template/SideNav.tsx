@@ -68,14 +68,14 @@ const SideNav = ({
                 style={{ height: HEADER_HEIGHT }}
             >
                 <Logo
-                    imgClass="max-h-10"
+                    imgClass="max-h-12"
                     mode={mode || defaultMode}
                     type={sideNavCollapse ? 'streamline' : 'full'}
                     className={classNames(
-                        sideNavCollapse && 'ltr:ml-[11.5px] ltr:mr-[11.5px]',
                         sideNavCollapse
-                            ? SIDE_NAV_CONTENT_GUTTER
+                            ? 'justify-center'
                             : LOGO_X_GUTTER,
+                        'flex items-center'
                     )}
                 />
             </Link>

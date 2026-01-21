@@ -112,7 +112,7 @@ const VerticalMenuContent = (props: VerticalMenuContentProps) => {
                                     )}
                             </VerticalCollapsedMenuItem>
                         )}
-                        {nav.type === NAV_ITEM_TYPE_TITLE && (
+                        {/* {nav.type === NAV_ITEM_TYPE_TITLE && (
                             <AuthorityCheck
                                 userAuthority={userAuthority}
                                 authority={nav.authority}
@@ -130,7 +130,7 @@ const VerticalMenuContent = (props: VerticalMenuContentProps) => {
                                         )}
                                 </MenuGroup>
                             </AuthorityCheck>
-                        )}
+                        )} */}
                     </Fragment>
                 ))}
             </>
